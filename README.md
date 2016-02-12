@@ -46,6 +46,7 @@
 下面是一些录像
 
 + [车尔尼599 第82条](http://v.youku.com/v_show/id_XMTQ2NzQ4OTE0NA==.html) 20160208
++ [小巴赫 第15条](http://v.youku.com/v_show/id_XMTQ2OTgwMDU0NA==.html)
 
 
 ## 如何坚持
