@@ -15,7 +15,11 @@ let practiceTime = (f) => {
     let note = fs.readFileSync(f);
     note = note.toString();
 
+    let summary = note.split('\n')[2];
     let time = {date};
+    if (summary.match(/上课/)) time.attendClass = true;
+    if (summary.match(/授课/)) time.giveClass = true;
+
     _.each(timers, (timer) => {
         let match = timer.re.exec(note);
         if (match && match[1].length < 8) {
@@ -33,10 +37,10 @@ let parseTime = (time) => {
     if (!time.text) return 0;
 
     let t;
-    if (_.indexOf(time.text, '小时') > -1) {
-        let {h, m} = time.text.split('小时');
+    if (time.text.match(/小时/g)) {
+        let [h, m] = time.text.split('小时');
         t = parseFloat(h) + parseFloat(m)/60;
-    } else if (_.indexOf(time.text, '半') > -1) {
+    } else if (time.text.match(/半/g)) {
         t = 0.5;
     } else if (time.unit == 'h') {
         t = parseFloat(time.text);
@@ -53,21 +57,50 @@ let parseDistribution = (times) => {
     let dist = {};
 
     _.each(times, (time) => {
-        console.log(time.date);
         let key = time.date.slice(0, 6);
-        dist[key] = dist[key] || {
-            days: 0,
-            hours: 0,
-        };
+        if (!dist[key]) {
+            dist[key] = {
+                days: 0,
+                hours: 0,
+                attendClass: 0,
+                giveClass: 0,
+            };
+        }
 
         let h = parseTime(time);
         if (h) {
             dist[key].days += 1;
             dist[key].hours += h;
         }
+        if (time.attendClass) dist[key].attendClass += 1;
+        if (time.giveClass) dist[key].giveClass += 1;
     });
 
     return dist;
+}
+
+let sumDistribution = (dist) => {
+    let summary = {};
+    _.each(dist, (stats, date) => {
+        _.each(stats, (val, key) => {
+            summary[key] = summary[key] || 0;
+            summary[key] += val;
+        });
+    });
+
+    return summary;
+}
+
+let formatDistribution = (dist) => {
+    _.each(dist, (stats, date) => {
+        console.log(
+            `${date.slice(0, 4)}年${parseInt(date.slice(4))}月: ` +
+            `练琴${stats.days}天，` +
+            `${stats.hours.toFixed(2)}小时，` +
+            `上课${stats.attendClass}次，` +
+            `授课${stats.giveClass}次`
+        );
+    });
 }
 
 let stats = (cb) => {
@@ -88,8 +121,9 @@ let stats = (cb) => {
         total += parseTime(time);
     });
 
-    console.log(total.toFixed(2));
-    console.log(parseDistribution(times));
+    let dist = parseDistribution(times);
+    formatDistribution(dist);
+    console.log(sumDistribution(dist));
 
     cb();
 }
