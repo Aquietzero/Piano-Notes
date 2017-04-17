@@ -75,6 +75,7 @@
 
 下面是一些录像
 
++ [舒伯特 音乐瞬间 no3](http://v.youku.com/v_show/id_XMjcxMDM4Njg2MA==.html) 20170414
 + [巴赫 二部创意曲08](http://v.youku.com/v_show/id_XMjY4Mzc3MTU2OA==.html) 20170402
 + [肖邦 降e大调夜曲](http://v.youku.com/v_show/id_XMjY1MjYwNjE4MA==.html) 20170320
 + [贝多芬 op49 no2 第一乐章](http://v.youku.com/v_show/id_XMTcxNzA0MTU4OA==.html) 20160908
