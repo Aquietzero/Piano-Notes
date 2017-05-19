@@ -92,7 +92,13 @@ let sumDistribution = (dist) => {
 }
 
 let formatDistribution = (dist) => {
-    _.each(dist, (stats, date) => {
+    // Only show the record of the past year.
+    dist = _.sortBy(_.toPairs(dist), function (p) {return p[0]});
+    dist = _.takeRight(dist, 12);
+
+    _.each(dist, (record) => {
+        var date = record[0];
+        var stats = record[1];
         console.log(
             `${date.slice(0, 4)}年${parseInt(date.slice(4))}月: ` +
             `练琴${stats.days}天，` +
