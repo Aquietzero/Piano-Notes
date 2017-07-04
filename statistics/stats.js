@@ -94,12 +94,12 @@ let sumDistribution = (dist) => {
 let formatDistribution = (dist) => {
     // Only show the record of the past year.
     dist = _.sortBy(_.toPairs(dist), function (p) {return p[0]});
-    dist = _.takeRight(dist, 12);
 
+    let byMonth = [];
     _.each(dist, (record) => {
         var date = record[0];
         var stats = record[1];
-        console.log(
+        byMonth.push(
             `${date.slice(0, 4)}年${parseInt(date.slice(4))}月: ` +
             `练琴${stats.days}天，` +
             `${stats.hours.toFixed(2)}小时，` +
@@ -107,6 +107,8 @@ let formatDistribution = (dist) => {
             `授课${stats.giveClass}次`
         );
     });
+
+    return byMonth;
 }
 
 let stats = (cb) => {
@@ -128,7 +130,9 @@ let stats = (cb) => {
     });
 
     let dist = parseDistribution(times);
-    formatDistribution(dist);
+    let byMonth = formatDistribution(dist);
+
+    _.each(byMonth, (m) => console.log(m));
     console.log(sumDistribution(dist));
 
     cb();
@@ -137,6 +141,9 @@ let stats = (cb) => {
 stats((err) => {
     if (err) console.log(err);
     console.log('done.');
-    process.exit();
+
+    setTimeout(() => {
+        process.exit();
+    }, 1000);
 });
 
