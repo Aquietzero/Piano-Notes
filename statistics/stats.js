@@ -2,24 +2,18 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 
-let practiceTime = (f) => {
-    let date = f.split('.')[0];
-    f = path.join('../', f);
+let extractTimeFromText = (date, note) => {
+    let time = {date};
+
     let timers = [{
         re: /练琴(.*)小时/g,
         unit: 'h',
     }, {
         re: /练琴(.*)分钟/g,
         unit: 'm',
-    }]
-    let note = fs.readFileSync(f);
-    note = note.toString();
+    }];
 
     let summary = note.split('\n')[2];
-    let time = {date};
-    if (summary.match(/上课/)) time.attendClass = true;
-    if (summary.match(/授课/)) time.giveClass = true;
-
     _.each(timers, (timer) => {
         let match = timer.re.exec(note);
         if (match && match[1].length < 8) {
@@ -30,7 +24,40 @@ let practiceTime = (f) => {
         }
     });
 
+    if (summary && summary.match(/上课/)) time.attendClass = true;
+    if (summary && summary.match(/授课/)) time.giveClass = true;
+
     return time;
+}
+
+let practiceTime = (f) => {
+    let date = f.split('.')[0];
+    f = path.join('../', f);
+    let note = fs.readFileSync(f);
+    note = note.toString();
+
+    let time = extractTimeFromText(date, note);
+    return time;
+}
+
+let practiceTimes2015 = () => {
+    let f = '2015.md';
+    f = path.join('../', f);
+    let note2015 = fs.readFileSync(f);
+    note2015 = note2015.toString();
+
+    let notes = note2015.split('\n');
+    let date, time, content;
+
+    let times = _.compact(_.map(notes, (note) => {
+        [date, time, content] = note.split(' ');
+        if (!time) return;
+
+        time = extractTimeFromText(date, time);
+        return time;
+    }));
+
+    return times;
 }
 
 let parseTime = (time) => {
@@ -120,9 +147,14 @@ let stats = (cb) => {
         return f.match(/\d+\.md/g);
     });
 
+    files = _.filter(files, (f) => f != '2015.md');
     let times = _.map(files, (f) => {
         return practiceTime(f);
     });
+
+    let times2015 = practiceTimes2015();
+
+    times = _.union(times2015, times);
 
     let total = 0;
     _.each(times, (time) => {
