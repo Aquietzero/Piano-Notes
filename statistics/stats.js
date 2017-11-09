@@ -13,7 +13,6 @@ let extractTimeFromText = (date, note) => {
         unit: 'm',
     }];
 
-    let summary = note.split('\n')[2];
     _.each(timers, (timer) => {
         let match = timer.re.exec(note);
         if (match && match[1].length < 8) {
@@ -24,6 +23,7 @@ let extractTimeFromText = (date, note) => {
         }
     });
 
+    let summary = note.split('\n')[2] || note;
     if (summary && summary.match(/上课/)) time.attendClass = true;
     if (summary && summary.match(/授课/)) time.giveClass = true;
 
@@ -37,6 +37,7 @@ let practiceTime = (f) => {
     note = note.toString();
 
     let time = extractTimeFromText(date, note);
+
     return time;
 }
 
@@ -161,6 +162,7 @@ let stats = (cb) => {
         total += parseTime(time);
     });
 
+    //times = _.filter(times, (t) => t.date < '20160101');
     let dist = parseDistribution(times);
     let byMonth = formatDistribution(dist);
 
