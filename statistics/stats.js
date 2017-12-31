@@ -116,17 +116,23 @@ let sumDistribution = (dist) => {
         });
     });
 
+    summary.text =
+      `总计: ` +
+      `练琴${summary.days}天，` +
+      `${summary.hours.toFixed(2)}小时，` +
+      `上课${summary.attendClass}次，` +
+      `授课${summary.giveClass}次`
+
     return summary;
 }
 
 let formatDistribution = (dist) => {
-    // Only show the record of the past year.
-    dist = _.sortBy(_.toPairs(dist), function (p) {return p[0]});
-
+    dist = _.sortBy(_.toPairs(dist), (p) => p[0]);
     let byMonth = [];
+
     _.each(dist, (record) => {
-        var date = record[0];
-        var stats = record[1];
+        let date = record[0];
+        let stats = record[1];
         byMonth.push(
             `${date.slice(0, 4)}年${parseInt(date.slice(4))}月: ` +
             `练琴${stats.days}天，` +
@@ -136,7 +142,24 @@ let formatDistribution = (dist) => {
         );
     });
 
-    return byMonth;
+    let byYear = [];
+    let byYearRecords = _.groupBy(dist, (record) => {
+        let date = record[0];
+        return date.slice(0, 4);
+    });
+
+    _.each(byYearRecords, (records, year) => {
+        let stats = _.map(records, (r) => r[1]);
+        byYear.push(
+            `${year}年: ` +
+            `练琴${_.sumBy(stats, (s) => s.days)}天，` +
+            `${(_.sumBy(stats, (s) => s.hours).toFixed(2))}小时，` +
+            `上课${_.sumBy(stats, (s) => s.attendClass)}次，` +
+            `授课${_.sumBy(stats, (s) => s.giveClass)}次`
+        );
+    });
+
+    return {byMonth, byYear};
 }
 
 let stats = (cb) => {
@@ -164,10 +187,13 @@ let stats = (cb) => {
 
     //times = _.filter(times, (t) => t.date < '20160101');
     let dist = parseDistribution(times);
-    let byMonth = formatDistribution(dist);
+    let {byMonth, byYear} = formatDistribution(dist);
 
     _.each(byMonth, (m) => console.log(m));
-    console.log(sumDistribution(dist));
+    console.log();
+    _.each(byYear, (y) => console.log(y));
+    console.log();
+    console.log(sumDistribution(dist).text);
 
     cb();
 }
