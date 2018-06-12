@@ -114,6 +114,8 @@
 
 下面是一些录像
 
++ [肖邦 升c小调夜曲](https://v.youku.com/v_show/id_XMzY1NzI1MjM3Mg.html) 20180610
++ [贝多芬 月光奏鸣曲 第一乐章](https://v.youku.com/v_show/id_XMzY1NzE5MzEzMg==.html) 20180610
 + [巴赫 三部创意曲01](http://v.youku.com/v_show/id_XMzI5MTE1MDY4OA==.html) 20180104
 + [莫扎特 k330第一乐章](http://v.youku.com/v_show/id_XMzE1NzY4MzgyMA==.html) 20171114
 + [柴可夫斯基 船歌](http://v.youku.com/v_show/id_XMzE0MzQ0NTYzNg==.html) 20171108
