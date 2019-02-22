@@ -32,7 +32,8 @@ let extractTimeFromText = (date, note) => {
 
 let practiceTime = (f) => {
     let date = f.split('.')[0];
-    f = path.join('../', f);
+    let year = date.slice(0, 4);
+    f = path.join('../', year, f);
     let note = fs.readFileSync(f);
     note = note.toString();
 
@@ -43,7 +44,7 @@ let practiceTime = (f) => {
 
 let practiceTimes2015 = () => {
     let f = '2015.md';
-    f = path.join('../', f);
+    f = path.join('../2015', f);
     let note2015 = fs.readFileSync(f);
     note2015 = note2015.toString();
 
@@ -133,13 +134,15 @@ let formatDistribution = (dist) => {
     _.each(dist, (record) => {
         let date = record[0];
         let stats = record[1];
-        byMonth.push(
-            `${date.slice(0, 4)}年${parseInt(date.slice(4))}月: ` +
-            `练琴${stats.days}天，` +
-            `${stats.hours.toFixed(2)}小时，` +
-            `上课${stats.attendClass}次，` +
-            `授课${stats.giveClass}次`
-        );
+        let year = date.slice(0, 4);
+        byMonth.push({
+            year,
+            info: `${year}年${parseInt(date.slice(4))}月: ` +
+                `练琴${stats.days}天，` +
+                `${stats.hours.toFixed(2)}小时，` +
+                `上课${stats.attendClass}次，` +
+                `授课${stats.giveClass}次`
+        });
     });
 
     let byYear = [];
@@ -150,21 +153,27 @@ let formatDistribution = (dist) => {
 
     _.each(byYearRecords, (records, year) => {
         let stats = _.map(records, (r) => r[1]);
-        byYear.push(
-            `${year}年: ` +
-            `练琴${_.sumBy(stats, (s) => s.days)}天，` +
-            `${(_.sumBy(stats, (s) => s.hours).toFixed(2))}小时，` +
-            `上课${_.sumBy(stats, (s) => s.attendClass)}次，` +
-            `授课${_.sumBy(stats, (s) => s.giveClass)}次`
-        );
+        byYear.push({
+            year,
+            info: `${year}年: ` +
+                `练琴${_.sumBy(stats, (s) => s.days)}天，` +
+                `${(_.sumBy(stats, (s) => s.hours).toFixed(2))}小时，` +
+                `上课${_.sumBy(stats, (s) => s.attendClass)}次，` +
+                `授课${_.sumBy(stats, (s) => s.giveClass)}次`
+        });
     });
 
     return {byMonth, byYear};
 }
 
 let stats = (cb) => {
-    let dir = path.join('../');
-    let files = fs.readdirSync(dir);
+    let dir = path.join('..');
+    let years = _.filter(fs.readdirSync(dir), (d) => {
+        return d.match(/20\d{2}/g) && d != '2015';
+    });
+    let files = _.flatten(_.map(years, (y) => {
+        return fs.readdirSync(path.join('..', y));
+    }));
 
     // notes are all with filename `yyyymmdd.md`
     files = _.filter(files, (f) => {
@@ -189,9 +198,21 @@ let stats = (cb) => {
     let dist = parseDistribution(times);
     let {byMonth, byYear} = formatDistribution(dist);
 
-    _.each(byMonth, (m) => console.log(m));
+    let y = byMonth[0].year;
+    console.log('------');
+    console.log(`${y}年`);
+    console.log('------');
+    _.each(byMonth, (m) => {
+        if (m.year != y) {
+            y = m.year;
+            console.log('------');
+            console.log(`${y}年`);
+            console.log('------');
+        }
+        console.log(m.info)
+    });
     console.log();
-    _.each(byYear, (y) => console.log(y));
+    _.each(byYear, (y) => console.log(y.info));
     console.log();
     console.log(sumDistribution(dist).text);
 
