@@ -177,7 +177,7 @@ let stats = (cb) => {
 
     // notes are all with filename `yyyymmdd.md`
     files = _.filter(files, (f) => {
-        return f.match(/\d+\.md/g);
+        return f.match(/\d+\.md/g) && !_.endsWith(f, '.swp');
     });
 
     files = _.filter(files, (f) => f != '2015.md');
